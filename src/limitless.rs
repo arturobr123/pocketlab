@@ -35,18 +35,16 @@ impl LimitlessClient {
         &self,
         limit: usize,
     ) -> Result<Vec<LimitlessTournament>, reqwest::Error> {
+        let limit = limit.to_string();
         self.http
             .get(format!("{}/tournaments", self.base_url))
-            .query(&[("game", "POCKET"), ("limit", &limit.to_string())])
+            .query(&[("game", "POCKET"), ("limit", limit.as_str())])
             .send()?
             .error_for_status()?
             .json()
     }
 
-    pub fn standings(
-        &self,
-        tournament_id: &str,
-    ) -> Result<Vec<LimitlessStanding>, reqwest::Error> {
+    pub fn standings(&self, tournament_id: &str) -> Result<Vec<LimitlessStanding>, reqwest::Error> {
         self.http
             .get(format!(
                 "{}/tournaments/{tournament_id}/standings",
