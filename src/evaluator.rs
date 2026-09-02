@@ -50,7 +50,10 @@ pub fn evaluate_deck<A: SimulationArena>(
     pool: &OpponentPool,
     config: &EvaluationConfig,
 ) -> DeckEvaluation {
-    assert!(!pool.opponents.is_empty(), "opponent pool must not be empty");
+    assert!(
+        !pool.opponents.is_empty(),
+        "opponent pool must not be empty"
+    );
     let weights = pool.normalized_weights();
     let mut matchups = Vec::with_capacity(pool.opponents.len());
 
