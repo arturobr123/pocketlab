@@ -38,6 +38,14 @@ impl CardRegistry {
     pub fn iter(&self) -> impl Iterator<Item = &Card> {
         self.cards.values()
     }
+
+    pub fn len(&self) -> usize {
+        self.cards.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.cards.is_empty()
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
