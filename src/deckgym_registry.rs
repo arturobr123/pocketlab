@@ -4,10 +4,8 @@
 
 use crate::domain::{Card, CardId, CardRegistry, CardType};
 use deckgym::{
-    card_ids::CardId as DeckGymCardId,
-    card_validation::get_implementation_status,
-    database::get_card_by_enum,
-    models::Card as DeckGymCard,
+    card_ids::CardId as DeckGymCardId, card_validation::get_implementation_status,
+    database::get_card_by_enum, models::Card as DeckGymCard,
 };
 use strum::IntoEnumIterator;
 
