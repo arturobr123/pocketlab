@@ -41,7 +41,9 @@ impl SimulationArena for DeterministicMockArena {
         let matchup_hash = stable_hash(&deck_a.canonical_key())
             ^ stable_hash(&deck_b.canonical_key()).rotate_left(17);
         let wins_a = (0..games)
-            .filter(|index| splitmix64(seed.wrapping_add(*index as u64)) ^ matchup_hash & 1 == 0)
+            .filter(|index| {
+                ((splitmix64(seed.wrapping_add(*index as u64)) ^ matchup_hash) & 1) == 0
+            })
             .count() as u64;
         MatchupResult {
             games: games as u64,
