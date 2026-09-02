@@ -178,7 +178,7 @@ mod tests {
             self.games_executed
                 .fetch_add(games as u64, Ordering::SeqCst);
             let wins_a = (0..games)
-                .filter(|index| seed.wrapping_add(*index as u64) % 2 == 0)
+                .filter(|index| seed.wrapping_add(*index as u64).is_multiple_of(2))
                 .count() as u64;
             MatchupResult {
                 games: games as u64,
