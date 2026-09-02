@@ -6,3 +6,5 @@ pub mod simulator;
 
 #[cfg(feature = "deckgym")]
 pub mod deckgym_adapter;
+#[cfg(feature = "deckgym")]
+pub mod deckgym_registry;
