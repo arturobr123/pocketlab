@@ -15,10 +15,7 @@ pub enum DeckTextError {
 /// - `2 A1 096`
 /// - `2 Poké Ball P-A 5`
 /// - `Energy: Lightning, Water`
-pub fn parse_pocket_deck_text(
-    text: &str,
-    registry: &CardRegistry,
-) -> Result<Deck, DeckTextError> {
+pub fn parse_pocket_deck_text(text: &str, registry: &CardRegistry) -> Result<Deck, DeckTextError> {
     let mut cards = BTreeMap::new();
     let mut explicit_energy: Option<BTreeSet<String>> = None;
 
@@ -74,7 +71,7 @@ pub fn parse_pocket_deck_text(
     Ok(Deck::new(cards, energy_types))
 }
 
-fn normalize_card_number(raw: &str) -> String {
+pub(crate) fn normalize_card_number(raw: &str) -> String {
     if raw.chars().all(|c| c.is_ascii_digit()) {
         format!("{raw:0>3}")
     } else {
@@ -82,7 +79,7 @@ fn normalize_card_number(raw: &str) -> String {
     }
 }
 
-fn normalize_energy(raw: &str) -> String {
+pub(crate) fn normalize_energy(raw: &str) -> String {
     match raw.to_ascii_lowercase().as_str() {
         "grass" => "Grass".into(),
         "fire" => "Fire".into(),
@@ -126,7 +123,8 @@ mod tests {
 
     #[test]
     fn parses_limitless_names_and_infers_energy() {
-        let deck = parse_pocket_deck_text("2 Pikachu A1 94\n2 Poké Ball P-A 5", &registry()).unwrap();
+        let deck =
+            parse_pocket_deck_text("2 Pikachu A1 94\n2 Poké Ball P-A 5", &registry()).unwrap();
         assert_eq!(deck.cards[&CardId("A1-094".into())], 2);
         assert_eq!(deck.cards[&CardId("P-A-005".into())], 2);
         assert_eq!(deck.energy_types, BTreeSet::from(["Lightning".into()]));
@@ -134,8 +132,8 @@ mod tests {
 
     #[test]
     fn explicit_energy_wins_over_inference() {
-        let deck = parse_pocket_deck_text("Energy: Fire, Water\n2 Pikachu A1 94", &registry())
-            .unwrap();
+        let deck =
+            parse_pocket_deck_text("Energy: Fire, Water\n2 Pikachu A1 94", &registry()).unwrap();
         assert_eq!(
             deck.energy_types,
             BTreeSet::from(["Fire".into(), "Water".into()])
