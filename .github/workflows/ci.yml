@@ -20,7 +20,11 @@ jobs:
         run: cargo run --quiet
       - name: Inspect Pocket standings schema
         run: |
-          curl -fsSL https://play.limitlesstcg.com/api/tournaments/pmpt44/standings \
+          tournament_id="$(curl -fsSL 'https://play.limitlesstcg.com/api/tournaments?game=POCKET&limit=100' \
+            | jq -r '.[] | select(.name | contains("PMPT #44")) | .id' \
+            | head -n 1)"
+          test -n "$tournament_id"
+          curl -fsSL "https://play.limitlesstcg.com/api/tournaments/${tournament_id}/standings" \
             | jq 'map(select(.decklist != null))[0] | {player, placing, deck, decklist}'
       - name: Format
         run: cargo fmt --all -- --check
