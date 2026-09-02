@@ -1,6 +1,7 @@
 pub mod deck_text;
 pub mod domain;
 pub mod evaluator;
+pub mod limitless;
 pub mod opponents;
 pub mod search;
 pub mod simulator;
