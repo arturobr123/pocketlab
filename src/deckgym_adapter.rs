@@ -107,10 +107,7 @@ impl SimulationArena for DeckGymArena {
             }
         }
 
-        debug_assert_eq!(
-            result.games,
-            result.wins_a + result.wins_b + result.draws
-        );
+        debug_assert_eq!(result.games, result.wins_a + result.wins_b + result.draws);
         result
     }
 }
@@ -188,10 +185,7 @@ mod tests {
     #[test]
     fn encodes_deckgym_text_without_card_names() {
         let deck = Deck::new(
-            BTreeMap::from([
-                (CardId("A3b-041".into()), 2),
-                (CardId("P-A-005".into()), 1),
-            ]),
+            BTreeMap::from([(CardId("A3b-041".into()), 2), (CardId("P-A-005".into()), 1)]),
             BTreeSet::from(["lightning".into(), "water".into()]),
         );
 
