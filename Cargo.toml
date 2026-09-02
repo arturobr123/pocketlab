@@ -7,11 +7,12 @@ license = "AGPL-3.0-only"
 
 [features]
 default = ["deckgym"]
-deckgym = ["dep:deckgym", "dep:rayon"]
+deckgym = ["dep:deckgym", "dep:rayon", "dep:strum"]
 
 [dependencies]
 deckgym = { git = "https://github.com/bcollazo/deckgym-core.git", rev = "fda48391a4747c7d9085e6a95520b731cee0b546", optional = true }
 rayon = { version = "1.10", optional = true }
+strum = { version = "0.27", optional = true }
 
 [lib]
 name = "pocketlab"
