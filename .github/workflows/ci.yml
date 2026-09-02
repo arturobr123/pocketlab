@@ -20,7 +20,8 @@ jobs:
       - name: Smoke run
         run: cargo run --quiet
       - name: Live Limitless meta smoke
-        run: cargo run --quiet -- meta "PMPT #44"
+        run: |
+          cargo run --quiet -- meta 'PMPT #44'
       - name: Live end-to-end evaluation smoke
         run: |
           cat > /tmp/pmpt44-winner.txt <<'EOF'
@@ -38,6 +39,6 @@ jobs:
           2 Leaf Cape A3 147
           2 Fragrant Forest B3 153
           EOF
-          cargo run --quiet -- evaluate /tmp/pmpt44-winner.txt "PMPT #44" 1
+          cargo run --quiet -- evaluate /tmp/pmpt44-winner.txt 'PMPT #44' 1
       - name: Format
         run: cargo fmt --all -- --check
