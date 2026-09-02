@@ -1,3 +1,4 @@
+pub mod cache;
 pub mod deck_text;
 pub mod domain;
 pub mod evaluator;
