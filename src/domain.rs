@@ -17,6 +17,8 @@ pub struct Card {
     pub id: CardId,
     pub name: String,
     pub card_type: CardType,
+    pub evolves_from: Option<String>,
+    pub required_energy_types: BTreeSet<String>,
     pub legal: bool,
     pub mechanics_implemented: bool,
 }
@@ -45,6 +47,17 @@ impl CardRegistry {
 
     pub fn is_empty(&self) -> bool {
         self.cards.is_empty()
+    }
+
+    pub fn infer_energy_types<'a>(
+        &self,
+        card_ids: impl IntoIterator<Item = &'a CardId>,
+    ) -> BTreeSet<String> {
+        card_ids
+            .into_iter()
+            .filter_map(|id| self.get(id))
+            .flat_map(|card| card.required_energy_types.iter().cloned())
+            .collect()
     }
 }
 
@@ -146,6 +159,8 @@ mod tests {
             id: CardId("A-001".into()),
             name: "Alpha".into(),
             card_type: CardType::Pokemon { basic: true },
+            evolves_from: None,
+            required_energy_types: BTreeSet::from(["Fire".into()]),
             legal: true,
             mechanics_implemented: true,
         });
@@ -153,6 +168,8 @@ mod tests {
             id: CardId("A-002".into()),
             name: "Beta".into(),
             card_type: CardType::Trainer,
+            evolves_from: None,
+            required_energy_types: BTreeSet::new(),
             legal: true,
             mechanics_implemented: true,
         });
@@ -169,12 +186,24 @@ mod tests {
     }
 
     #[test]
+    fn infers_energy_from_cards() {
+        let r = registry();
+        let ids = [CardId("A-001".into()), CardId("A-002".into())];
+        assert_eq!(
+            r.infer_energy_types(ids.iter()),
+            BTreeSet::from(["Fire".to_string()])
+        );
+    }
+
+    #[test]
     fn validates_name_copy_limit_across_printings() {
         let mut r = registry();
         r.insert(Card {
             id: CardId("B-001".into()),
             name: "Alpha".into(),
             card_type: CardType::Pokemon { basic: true },
+            evolves_from: None,
+            required_energy_types: BTreeSet::from(["Fire".into()]),
             legal: true,
             mechanics_implemented: true,
         });
