@@ -154,7 +154,10 @@ fn evaluate_deck(deck_path: &str, tournament_fragment: &str, games: u32) -> Resu
     println!("Opponent pool: {}", tournament.name);
     println!("Unique opponent decks: {}", import.pool.opponents.len());
     println!("Simulated games: {}", result.games);
-    println!("Weighted win rate: {:.2}%", result.weighted_win_rate * 100.0);
+    println!(
+        "Weighted win rate: {:.2}%",
+        result.weighted_win_rate * 100.0
+    );
     println!("Wilson LCB95: {:.2}%", result.weighted_lcb95 * 100.0);
     println!("CVaR10: {:.2}%", result.cvar10 * 100.0);
     println!("Robust score: {:.4}", result.robust_score);
