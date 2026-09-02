@@ -16,5 +16,7 @@ jobs:
         run: cargo test --all-features
       - name: Clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: Smoke run
+        run: cargo run --quiet
       - name: Format
         run: cargo fmt --all -- --check
