@@ -7,6 +7,7 @@ use deckgym::{
     card_ids::CardId as DeckGymCardId, card_validation::get_implementation_status,
     database::get_card_by_enum, models::Card as DeckGymCard,
 };
+use std::collections::BTreeSet;
 use strum::IntoEnumIterator;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -21,11 +22,25 @@ pub fn build_deckgym_registry() -> CardRegistry {
 
     for deckgym_id in DeckGymCardId::iter() {
         let deckgym_card = get_card_by_enum(deckgym_id);
-        let card_type = match &deckgym_card {
-            DeckGymCard::Pokemon(pokemon) => CardType::Pokemon {
-                basic: pokemon.stage == 0,
-            },
-            DeckGymCard::Trainer(_) => CardType::Trainer,
+        let (card_type, evolves_from, required_energy_types) = match &deckgym_card {
+            DeckGymCard::Pokemon(pokemon) => {
+                let required_energy_types = pokemon
+                    .attacks
+                    .iter()
+                    .flat_map(|attack| attack.energy_required.iter())
+                    .filter(|energy| energy.is_selectable())
+                    .map(|energy| energy.as_str().to_string())
+                    .collect::<BTreeSet<_>>();
+
+                (
+                    CardType::Pokemon {
+                        basic: pokemon.stage == 0,
+                    },
+                    pokemon.evolves_from.clone(),
+                    required_energy_types,
+                )
+            }
+            DeckGymCard::Trainer(_) => (CardType::Trainer, None, BTreeSet::new()),
         };
         let mechanics_implemented = get_implementation_status(deckgym_id).is_complete();
 
@@ -33,6 +48,8 @@ pub fn build_deckgym_registry() -> CardRegistry {
             id: CardId(normalize_deckgym_card_id(&deckgym_card.get_id())),
             name: deckgym_card.get_name(),
             card_type,
+            evolves_from,
+            required_energy_types,
             legal: true,
             mechanics_implemented,
         });
@@ -79,6 +96,7 @@ mod tests {
             bulbasaur.card_type,
             CardType::Pokemon { basic: true }
         ));
+        assert!(bulbasaur.required_energy_types.contains("Grass"));
 
         let stats = registry_stats(&registry);
         assert!(stats.total_cards > 1_000);
