@@ -18,5 +18,9 @@ jobs:
         run: cargo clippy --all-targets --all-features -- -D warnings
       - name: Smoke run
         run: cargo run --quiet
+      - name: Inspect Pocket standings schema
+        run: |
+          curl -fsSL https://play.limitlesstcg.com/api/tournaments/pmpt44/standings \
+            | jq 'map(select(.decklist != null))[0] | {player, placing, deck, decklist}'
       - name: Format
         run: cargo fmt --all -- --check
