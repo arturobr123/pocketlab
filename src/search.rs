@@ -4,7 +4,7 @@ use crate::{
     opponents::OpponentPool,
     simulator::SimulationArena,
 };
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Clone, Debug)]
 pub struct ScoredDeck {
@@ -105,12 +105,24 @@ fn mutate_one_slot(
         let mut cards = deck.cards.clone();
         decrement(&mut cards, &remove);
         *cards.entry(add).or_default() += 1;
-        let child = Deck::new(cards, deck.energy_types.clone());
+        let child = Deck::new(cards.clone(), inferred_energy(registry, cards.keys()));
         if child.validate(registry).is_ok() {
             return Some(child);
         }
     }
     None
+}
+
+fn inferred_energy<'a>(
+    registry: &CardRegistry,
+    card_ids: impl IntoIterator<Item = &'a CardId>,
+) -> BTreeSet<String> {
+    let inferred = registry.infer_energy_types(card_ids);
+    if inferred.is_empty() {
+        BTreeSet::from(["Water".to_string()])
+    } else {
+        inferred
+    }
 }
 
 fn decrement(cards: &mut BTreeMap<CardId, u8>, id: &CardId) {
