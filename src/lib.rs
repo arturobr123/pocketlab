@@ -1,3 +1,4 @@
+pub mod deck_text;
 pub mod domain;
 pub mod evaluator;
 pub mod opponents;
