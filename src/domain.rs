@@ -48,7 +48,10 @@ pub struct Deck {
 
 impl Deck {
     pub fn new(cards: BTreeMap<CardId, u8>, energy_types: BTreeSet<String>) -> Self {
-        Self { cards, energy_types }
+        Self {
+            cards,
+            energy_types,
+        }
     }
 
     pub fn total_cards(&self) -> u8 {
