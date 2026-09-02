@@ -1,0 +1,22 @@
+[package]
+name = "pocketlab"
+version = "0.1.0"
+edition = "2021"
+description = "Robust deck search for Pokemon TCG Pocket"
+license = "AGPL-3.0-only"
+
+[features]
+default = ["deckgym"]
+deckgym = ["dep:deckgym", "dep:rayon"]
+
+[dependencies]
+deckgym = { git = "https://github.com/bcollazo/deckgym-core.git", rev = "fda48391a4747c7d9085e6a95520b731cee0b546", optional = true }
+rayon = { version = "1.10", optional = true }
+
+[lib]
+name = "pocketlab"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pocketlab"
+path = "src/main.rs"
