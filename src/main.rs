@@ -129,10 +129,12 @@ fn show_meta(_fragment: &str) -> Result<(), String> {
 #[cfg(feature = "deckgym")]
 fn evaluate_deck(deck_path: &str, tournament_fragment: &str, games: u32) -> Result<(), String> {
     use pocketlab::{
+        cache::{CachedArena, SqliteMatchupCache},
         deck_text::parse_pocket_deck_text,
         deckgym_adapter::DeckGymArena,
         evaluator::{evaluate_deck as evaluate, EvaluationConfig},
     };
+    use std::path::Path;
 
     let registry = build_registry();
     let text = std::fs::read_to_string(deck_path)
@@ -143,7 +145,21 @@ fn evaluate_deck(deck_path: &str, tournament_fragment: &str, games: u32) -> Resu
         .map_err(|error| format!("invalid or unsupported deck: {error:?}"))?;
 
     let (tournament, import) = load_meta(tournament_fragment, &registry)?;
-    let arena = DeckGymArena::default();
+    let cache_path = env::var("POCKETLAB_CACHE")
+        .unwrap_or_else(|_| ".pocketlab/matchups.sqlite".to_string());
+    if let Some(parent) = Path::new(&cache_path).parent() {
+        if !parent.as_os_str().is_empty() {
+            std::fs::create_dir_all(parent)
+                .map_err(|error| format!("failed to create cache directory: {error}"))?;
+        }
+    }
+    let cache = SqliteMatchupCache::open(&cache_path)
+        .map_err(|error| format!("failed to open matchup cache '{cache_path}': {error}"))?;
+    let arena = CachedArena::new(
+        DeckGymArena::default(),
+        cache,
+        "deckgym:fda48391:weighted-random-vs-weighted-random:v1",
+    );
     let config = EvaluationConfig {
         games_per_matchup: games,
         ..EvaluationConfig::default()
@@ -154,6 +170,7 @@ fn evaluate_deck(deck_path: &str, tournament_fragment: &str, games: u32) -> Resu
     println!("Opponent pool: {}", tournament.name);
     println!("Unique opponent decks: {}", import.pool.opponents.len());
     println!("Simulated games: {}", result.games);
+    println!("Matchup cache: {cache_path}");
     println!(
         "Weighted win rate: {:.2}%",
         result.weighted_win_rate * 100.0
